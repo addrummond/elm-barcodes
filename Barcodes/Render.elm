@@ -116,7 +116,17 @@ type alias Barcode msg =
     , barWidth : Float
     , barHeight : Float
     , barcode : String
+    , labelStyle : LabelStyle
+    , includeDelimiters : Bool
     }
+
+
+{-| Determines how the text below the barcode (if any) is displayed.
+-}
+type LabelStyle
+    = NoLabel
+    | LabelHalfBelow
+    | LabelBelow
 
 
 {-| Default barcode configuration.
@@ -128,6 +138,8 @@ init =
     , barWidth = 2
     , barHeight = 150
     , barcode = ""
+    , labelStyle = LabelHalfBelow
+    , includeDelimiters = True
     }
 
 
@@ -192,13 +204,24 @@ dropWhile predicate list =
 {-| Render as a code 39 barcode
 -}
 code39BarcodeSvg : Barcode msg -> Maybe (Html msg)
-code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode } as c39b) =
+code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode, labelStyle, includeDelimiters } as c39b) =
     let
         fontSize =
-            barHeight * 0.15
+            barHeight
+                * (if includeDelimiters then
+                    0.13
+                   else
+                    0.14
+                  )
+
+        withDelims =
+            if includeDelimiters then
+                "*" ++ barcode ++ "*"
+            else
+                barcode
 
         textWidth =
-            fontSize * toFloat (String.length barcode) * 1.1
+            fontSize * toFloat (String.length withDelims) * 1.1
     in
     code39BarcodeUnwrappedSvg c39b
         |> Maybe.map
@@ -247,7 +270,14 @@ code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, ba
                                 [ ( "width", toString (width - loffset - roffset) ++ barWidthUnit )
                                 , ( "margin-left", toString loffset ++ barWidthUnit )
                                 , ( "display", "table" )
-                                , ( "transform", "translateY(50%)" )
+                                , ( "transform"
+                                  , case labelStyle of
+                                        LabelHalfBelow ->
+                                            "translateY(50%)"
+
+                                        _ ->
+                                            "translateY(100%)"
+                                  )
                                 , ( "text-align", "center" )
                                 , ( "background", "white" )
                                 , ( "color", "black" )
@@ -259,7 +289,7 @@ code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, ba
                                 , ( "text-indent", "0.5ex" )
                                 ]
                             ]
-                            [ text barcode ]
+                            [ text withDelims ]
                         ]
                     ]
             )
