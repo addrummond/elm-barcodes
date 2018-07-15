@@ -8,7 +8,7 @@ Barcode scanners
 the `value` property of a text input (https://github.com/etaque/elm-form/issues/54).
 The `<input>` manged by the `Barcode.Input` component does not have its `value`
 property updated to match a value in the component state. It is, however,
-possible to clear the input. This is accomplished by removing the original
+possible to clear the input field. This is accomplished by removing the original
 `<input>` node and inserting a new one.
 
 To compile the example app, run the following command from the main project dir:
