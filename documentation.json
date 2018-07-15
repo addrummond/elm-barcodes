@@ -1,5 +1,58 @@
 [
   {
+    "name": "Barcodes.Render",
+    "comment": " A module for rendering barcodes using inline SVG. Currently supports code 39\nbarcodes only.\n\n@docs Barcode, barHeight, barWidth, barcode, code39, init, svgAttributes, wrapperDivAttributes\n\n",
+    "aliases": [
+      {
+        "name": "Barcode",
+        "comment": " Barcode configuration.\n",
+        "args": [
+          "msg"
+        ],
+        "type": "{ svgAttributes : List (Html.Attribute msg) , wrapperDivAttributes : List (Html.Attribute msg) , barWidth : Float , barHeight : Float , barcode : String , labelStyle : Barcodes.Render.LabelStyle , includeDelimiters : Bool }"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "barHeight",
+        "comment": " Set the height of the barcode in px.\n",
+        "type": "Float -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "barWidth",
+        "comment": " Set the width of the barcode in px.\n",
+        "type": "Float -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "barcode",
+        "comment": " Set the barcode text\n",
+        "type": "String -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "code39",
+        "comment": " Render as a code 39 barcode. Nothing is returned if the barcode contains\ncharacters that cannot be encoded using code 39.\n",
+        "type": "Barcodes.Render.Barcode msg -> Maybe.Maybe (Html.Html msg)"
+      },
+      {
+        "name": "init",
+        "comment": " Default barcode configuration.\n",
+        "type": "Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "svgAttributes",
+        "comment": " Set the attributes for the svg node.\n",
+        "type": "List (Html.Attribute msg) -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "wrapperDivAttributes",
+        "comment": " Set the attributes of the div wrapping the barcode and its label.\n",
+        "type": "List (Html.Attribute msg) -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
     "name": "Barcodes.Input",
     "comment": " A view-only component for receiving input from barcode scanners. The input\nstate is exposed via the opaque 'BarcodeInputValue' record, an instance of which\nshould live in the parent state.\n\n\n# Component configuration and state\n\n@docs Config, Msgs, State\n\n\n# Manage component state\n\n@docs init, defaultConfig, attributes, allowEmptyScans, clear, clobber, enter, isEmpty, reset, update\n\n\n# View\n\n@docs view\n\n",
     "aliases": [
@@ -83,59 +136,6 @@
         "name": "view",
         "comment": " View the component.\n",
         "type": "Barcodes.Input.Config msg -> Barcodes.Input.Msgs msg -> Barcodes.Input.State -> Html.Html msg"
-      }
-    ],
-    "generated-with-elm-version": "0.18.0"
-  },
-  {
-    "name": "Barcodes.Render",
-    "comment": " A module for rendering barcodes using inline SVG. Currently, only code 39\nbarcodes are supported.\n\n@docs Barcode, barHeight, barWidth, barcode, code39, init, svgAttributes, wrapperDivAttributes\n\n",
-    "aliases": [
-      {
-        "name": "Barcode",
-        "comment": " Barcode configuration.\n",
-        "args": [
-          "msg"
-        ],
-        "type": "{ svgAttributes : List (Html.Attribute msg) , wrapperDivAttributes : List (Html.Attribute msg) , barWidth : Float , barHeight : Float , barcode : String , labelStyle : Barcodes.Render.LabelStyle , includeDelimiters : Bool }"
-      }
-    ],
-    "types": [],
-    "values": [
-      {
-        "name": "barHeight",
-        "comment": " Set the height of the barcode in px.\n",
-        "type": "Float -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
-      },
-      {
-        "name": "barWidth",
-        "comment": " Set the width of the barcode in px.\n",
-        "type": "Float -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
-      },
-      {
-        "name": "barcode",
-        "comment": " Set the barcode text\n",
-        "type": "String -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
-      },
-      {
-        "name": "code39",
-        "comment": " Render as a code 39 barcode\n",
-        "type": "Barcodes.Render.Barcode msg -> Maybe.Maybe (Html.Html msg)"
-      },
-      {
-        "name": "init",
-        "comment": " Default barcode configuration.\n",
-        "type": "Barcodes.Render.Barcode msg"
-      },
-      {
-        "name": "svgAttributes",
-        "comment": " Set the attributes for the <svg> element of the barcode.\n",
-        "type": "List (Html.Attribute msg) -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
-      },
-      {
-        "name": "wrapperDivAttributes",
-        "comment": " Set the attributes of the <div> wrapping the barcode and its label.\n",
-        "type": "List (Html.Attribute msg) -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
       }
     ],
     "generated-with-elm-version": "0.18.0"

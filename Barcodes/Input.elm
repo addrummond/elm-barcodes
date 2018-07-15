@@ -1,7 +1,7 @@
 module Barcodes.Input exposing (Config, Msgs, State, allowEmptyScans, attributes, clear, clobber, defaultConfig, enter, init, isEmpty, reset, update, view)
 
 {-| A view-only component for receiving input from barcode scanners. The input
-state is exposed via the opaque 'BarcodeInputValue' record, an instance of which
+state is exposed via the opaque BarcodeInputValue record, an instance of which
 should live in the parent state.
 
 
@@ -31,7 +31,7 @@ import Json.Decode as Json
 import Maybe
 
 
-{-| The size and list of attributes for the text input node.
+{-| The size and list of attributes for the text input node
 -}
 type alias Config msg =
     { size : Int
@@ -42,7 +42,7 @@ type alias Config msg =
 
 
 {-| Specifies a no-op message, the message triggered on text input, and the
-message triggered when the scan terminates.
+message triggered when the scan terminates
 -}
 type alias Msgs msg =
     { onInput : String -> msg
@@ -51,7 +51,7 @@ type alias Msgs msg =
     }
 
 
-{-| This should live somewhere in the state of the parent component.
+{-| This should live somewhere in the state of the parent component
 -}
 type State
     = State
@@ -65,7 +65,7 @@ type State
         }
 
 
-{-| The state of an empty barcode input.
+{-| The state of an empty barcode input
 -}
 init : State
 init =
@@ -76,7 +76,7 @@ init =
         }
 
 
-{-| Reset the barcode input to its initial state.
+{-| Reset the barcode input to its initial state
 -}
 reset : State -> State
 reset (State biv) =
@@ -103,7 +103,7 @@ clobber v (State biv) =
         }
 
 
-{-| Empty the barcode input.
+{-| Empty the barcode input
 -}
 clear : State -> State
 clear s =
@@ -173,7 +173,7 @@ onKeyDownWithValue tagger =
             (Json.field "target" <| Json.field "value" Json.string)
 
 
-{-| View the component.
+{-| View the component
 -}
 view : Config msg -> Msgs msg -> State -> Html msg
 view { size, attributes, triggerKeyCodes, allowEmptyScans } { onInput, onEnter, noOp } (State { clearKey, initialValue }) =

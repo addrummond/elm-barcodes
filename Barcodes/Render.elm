@@ -1,7 +1,7 @@
 module Barcodes.Render exposing (Barcode, barHeight, barWidth, barcode, code39, init, svgAttributes, wrapperDivAttributes)
 
-{-| A module for rendering barcodes using inline SVG. Currently, only code 39
-barcodes are supported.
+{-| A module for rendering barcodes using inline SVG. Currently supports code 39
+barcodes only.
 
 @docs Barcode, barHeight, barWidth, barcode, code39, init, svgAttributes, wrapperDivAttributes
 
@@ -90,7 +90,7 @@ widthOfBar bar =
             0
 
 
-{-| Barcode configuration.
+{-| Barcode configuration
 -}
 type alias Barcode msg =
     { svgAttributes : List (Attribute msg)
@@ -103,7 +103,7 @@ type alias Barcode msg =
     }
 
 
-{-| Determines how the text below the barcode (if any) is displayed.
+{-| Determines how the text below the barcode (if any) is displayed
 -}
 type LabelStyle
     = NoLabel
@@ -111,7 +111,7 @@ type LabelStyle
     | LabelBelow
 
 
-{-| Default barcode configuration.
+{-| Default barcode configuration
 -}
 init : Barcode msg
 init =
@@ -125,28 +125,28 @@ init =
     }
 
 
-{-| Set the attributes for the <svg> element of the barcode.
+{-| Set additional attributes for the svg node
 -}
 svgAttributes : List (Attribute msg) -> Barcode msg -> Barcode msg
 svgAttributes a c =
     { c | svgAttributes = a }
 
 
-{-| Set the attributes of the <div> wrapping the barcode and its label.
+{-| Set additional attributes for the div wrapping the barcode and its label
 -}
 wrapperDivAttributes : List (Attribute msg) -> Barcode msg -> Barcode msg
 wrapperDivAttributes a c =
     { c | wrapperDivAttributes = a }
 
 
-{-| Set the width of the barcode in px.
+{-| Set the width of the barcode in px
 -}
 barWidth : Float -> Barcode msg -> Barcode msg
 barWidth w c =
     { c | barWidth = w }
 
 
-{-| Set the height of the barcode in px.
+{-| Set the height of the barcode in px
 -}
 barHeight : Float -> Barcode msg -> Barcode msg
 barHeight h c =
@@ -183,7 +183,8 @@ dropWhile predicate list =
                 list
 
 
-{-| Render as a code 39 barcode
+{-| Renders the barcode as a code 39 barcode. Nothing is returned if the barcode
+contains characters that cannot be encoded using code 39.
 -}
 code39 : Barcode msg -> Maybe (Html msg)
 code39 ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode, labelStyle, includeDelimiters } as c39b) =
