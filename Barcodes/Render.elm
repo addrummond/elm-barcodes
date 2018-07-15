@@ -1,9 +1,9 @@
-module Barcodes.Render exposing (Barcode, barHeight, barWidth, barcode, code39BarcodeSvg, init, svgAttributes, wrapperDivAttributes)
+module Barcodes.Render exposing (Barcode, barHeight, barWidth, barcode, code39, init, svgAttributes, wrapperDivAttributes)
 
 {-| A module for rendering barcodes using inline SVG. Currently, only code 39
 barcodes are supported.
 
-@docs Barcode, barHeight, barWidth, barcode, code39BarcodeSvg, init, svgAttributes, wrapperDivAttributes
+@docs Barcode, barHeight, barWidth, barcode, code39, init, svgAttributes, wrapperDivAttributes
 
 -}
 
@@ -23,8 +23,8 @@ type Bar
     | S -- Wide space
 
 
-code39 : Dict Char (List Bar)
-code39 =
+code39Chars : Dict Char (List Bar)
+code39Chars =
     Dict.fromList
         [ ( 'A', [ W, N, N, S, N, W ] )
         , ( 'B', [ N, W, N, S, N, W ] )
@@ -185,8 +185,8 @@ dropWhile predicate list =
 
 {-| Render as a code 39 barcode
 -}
-code39BarcodeSvg : Barcode msg -> Maybe (Html msg)
-code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode, labelStyle, includeDelimiters } as c39b) =
+code39 : Barcode msg -> Maybe (Html msg)
+code39 ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode, labelStyle, includeDelimiters } as c39b) =
     let
         fontSize =
             barHeight
@@ -296,7 +296,7 @@ code39BarcodeUnwrappedSvg { svgAttributes, barWidth, barHeight, barcode } =
     let
         mbars : Maybe (List Bar)
         mbars =
-            Maybe.map List.concat <| combine <| List.map (\c -> Dict.get c code39) (String.toList barcode)
+            Maybe.map List.concat <| combine <| List.map (\c -> Dict.get c code39Chars) (String.toList barcode)
     in
     case mbars of
         Nothing ->

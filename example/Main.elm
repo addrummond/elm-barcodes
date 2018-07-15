@@ -53,7 +53,7 @@ view : Model -> Html Msg
 view { inputState, scans } =
     div [ style [ ( "width", "700px" ), ( "margin", "auto" ) ] ]
         [ h2 [] [ text "Example code 39 barcode render" ]
-        , case BR.code39BarcodeSvg (BR.init |> BR.barcode "ABCD1234XYZ987") of
+        , case BR.code39 (BR.init |> BR.barcode "ABCD1234XYZ987") of
             Just b ->
                 b
 
