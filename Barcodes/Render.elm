@@ -1,11 +1,17 @@
-module Barcodes.Render exposing (Barcode, barHeight, barHeightUnit, barWidth, barWidthUnit, barcode, code39BarcodeSvg, init, svgAttributes, wrapperDivAttributes)
+module Barcodes.Render exposing (Barcode, barHeight, barWidth, barcode, code39BarcodeSvg, init, svgAttributes, wrapperDivAttributes)
+
+{-| A module for rendering barcodes using inline SVG. Currently, only code 39
+barcodes are supported.
+
+@docs Barcode, barHeight, barWidth, barcode, code39BarcodeSvg, init, svgAttributes, wrapperDivAttributes
+
+-}
 
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import List.Extra as List
+import List
 import Maybe
-import Maybe.Extra as Maybe
 import State exposing (State(..))
 import Svg
 import Svg.Attributes
@@ -102,6 +108,8 @@ widthOfBar bar =
             0
 
 
+{-| Barcode configuration.
+-}
 type alias Barcode msg =
     { svgAttributes : List (Attribute msg)
     , wrapperDivAttributes : List (Attribute msg)
@@ -111,6 +119,8 @@ type alias Barcode msg =
     }
 
 
+{-| Default barcode configuration.
+-}
 init : Barcode msg
 init =
     { svgAttributes = []
@@ -121,26 +131,36 @@ init =
     }
 
 
+{-| Set the attributes for the <svg> element of the barcode.
+-}
 svgAttributes : List (Attribute msg) -> Barcode msg -> Barcode msg
 svgAttributes a c =
     { c | svgAttributes = a }
 
 
+{-| Set the attributes of the <div> wrapping the barcode and its label.
+-}
 wrapperDivAttributes : List (Attribute msg) -> Barcode msg -> Barcode msg
 wrapperDivAttributes a c =
     { c | wrapperDivAttributes = a }
 
 
+{-| Set the width of the barcode in px.
+-}
 barWidth : Float -> Barcode msg -> Barcode msg
 barWidth w c =
     { c | barWidth = w }
 
 
+{-| Set the height of the barcode in px.
+-}
 barHeight : Float -> Barcode msg -> Barcode msg
 barHeight h c =
     { c | barHeight = h }
 
 
+{-| Set the barcode text
+-}
 barcode : String -> Barcode msg -> Barcode msg
 barcode b c =
     { c | barcode = b }
@@ -156,6 +176,21 @@ barHeightUnit =
     "px"
 
 
+dropWhile : (a -> Bool) -> List a -> List a
+dropWhile predicate list =
+    case list of
+        [] ->
+            []
+
+        x :: xs ->
+            if predicate x then
+                dropWhile predicate xs
+            else
+                list
+
+
+{-| Render as a code 39 barcode
+-}
 code39BarcodeSvg : Barcode msg -> Maybe (Html msg)
 code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode } as c39b) =
     let
@@ -173,7 +208,7 @@ code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, ba
                         (width - textWidth) * 0.5
 
                     loffset =
-                        case List.dropWhile (\pos -> pos < textBorder - barWidth) positions of
+                        case dropWhile (\pos -> pos < textBorder - barWidth) positions of
                             [] ->
                                 0
 
@@ -181,7 +216,7 @@ code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, ba
                                 x
 
                     roffset =
-                        case List.dropWhile (\pos -> pos < width - textBorder) positions of
+                        case dropWhile (\pos -> pos < width - textBorder) positions of
                             [] ->
                                 0
 
@@ -229,12 +264,26 @@ code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, ba
             )
 
 
+combine : List (Maybe a) -> Maybe (List a)
+combine xs =
+    let
+        f e m =
+            case ( e, m ) of
+                ( Just x, Just xs ) ->
+                    Just <| x :: xs
+
+                _ ->
+                    Nothing
+    in
+    List.foldr f (Just []) xs
+
+
 code39BarcodeUnwrappedSvg : Barcode msg -> Maybe ( Html msg, List Float, Float )
 code39BarcodeUnwrappedSvg { svgAttributes, barWidth, barHeight, barcode } =
     let
         mbars : Maybe (List Bar)
         mbars =
-            Maybe.map List.concat <| Maybe.combine <| List.map (\c -> Dict.get c code39) (String.toList barcode)
+            Maybe.map List.concat <| combine <| List.map (\c -> Dict.get c code39) (String.toList barcode)
     in
     case mbars of
         Nothing ->

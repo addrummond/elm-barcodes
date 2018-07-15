@@ -1,12 +1,30 @@
-module Barcode.Input exposing (Config, Msgs, State, clear, defaultConfig, enter, init, isEmpty, reset, update, view)
+module Barcodes.Input exposing (Config, Msgs, State, clear, defaultConfig, enter, enteredValue, init, isEmpty, reset, update, view)
 
-{-| A view-only widget for receiving input from barcode scanners. It consists
+{-| A view-only component for receiving input from barcode scanners. It consists
 of a text input and an optional "entered value" displayed to the right of the
 input. A String -> Bool predicate determines whether or not the contents
 of the text input and/or the entered value are displayed with an error
 highlight. The input state is exposed via the opaque 'BarcodeInputValue' record,
 an instance of which should live in the parent state.
+
+
+# Component configuration, messages and state
+
+@docs Config, Msgs, State
+
+
+# Initialize, update and interrogate component state
+
+@docs init, defaultConfig, clear, enter, enteredValue, isEmpty, reset, update
+
+
+# View the component
+
+@docs view
+
 -}
+
+--import Maybe.Extra as Maybe
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -14,18 +32,19 @@ import Html.Events exposing (..)
 import Html.Keyed as Keyed
 import Json.Decode as Json
 import Maybe
-import Maybe.Extra as Maybe
-import SemanticUI as SemanticUI
-import SemanticUI.Elements.Label as Label
 
 
+{-| The size and list of attributes for the text <input>.
+-}
 type alias Config msg =
-    { isError : String -> Bool
-    , size : Int
+    { size : Int
     , attributes : List (Attribute msg)
     }
 
 
+{-| Specifies a no-op message and messages triggered on input and when enter
+is pressed.
+-}
 type alias Msgs msg =
     { onInput : String -> msg
     , onEnter : String -> msg
@@ -33,6 +52,8 @@ type alias Msgs msg =
     }
 
 
+{-| This should live somewhere in the state of the parent component.
+-}
 type State
     = State
         { clearKey : Int
@@ -65,7 +86,7 @@ reset (State biv) =
         }
 
 
-{-| Empy the text input.
+{-| Empty the text input.
 -}
 clear : State -> State
 clear (State biv) =
@@ -111,6 +132,13 @@ enter (State biv) v =
         }
 
 
+{-| The value, if any, which has been scanned in.
+-}
+enteredValue : State -> Maybe String
+enteredValue (State { enteredValue }) =
+    enteredValue
+
+
 {-| Returns true iff nothing has been entered in the input.
 -}
 isEmpty : State -> Bool
@@ -118,10 +146,11 @@ isEmpty (State biv) =
     biv.transientValue == "" && biv.enteredValue == Nothing
 
 
+{-| Default configuration
+-}
 defaultConfig : Config msg
 defaultConfig =
-    { isError = always False
-    , size = 30
+    { size = 30
     , attributes = []
     }
 
@@ -135,66 +164,31 @@ onKeyDownWithValue tagger =
             (Json.field "target" <| Json.field "value" Json.string)
 
 
+{-| View the component.
+-}
 view : Config msg -> Msgs msg -> State -> Html msg
-view { isError, size, attributes } { onInput, onEnter, noOp } (State { clearKey, transientValue, enteredValue }) =
-    let
-        lab =
-            Label.init
-    in
+view { size, attributes } { onInput, onEnter, noOp } (State { clearKey, transientValue, enteredValue }) =
     div []
-        [ Keyed.node "div"
-            -- elm-semantic-ui doesn't provide 'labeled' class
-            [ class "ui input"
-            , classList
-                [ ( "right", Maybe.isJust enteredValue )
-                , ( "labeled", Maybe.isJust enteredValue )
-                , ( "error", isError transientValue )
-                ]
-            ]
-          <|
-            List.concat
-                [ [ ( toString clearKey
-                    , input
-                        ([ type_ "text"
-                         , Html.Attributes.size size
-                         , Html.Events.onInput onInput
-                         , onKeyDownWithValue
-                            (\key value ->
-                                case key of
-                                    13 ->
-                                        onEnter value
+        [ Keyed.node "input" [] <|
+            [ ( toString clearKey
+              , input
+                    ([ type_ "text"
+                     , Html.Attributes.size size
+                     , Html.Events.onInput onInput
+                     , onKeyDownWithValue
+                        (\key value ->
+                            case key of
+                                13 ->
+                                    onEnter value
 
-                                    _ ->
-                                        noOp
-                            )
-                         , defaultValue ""
-                         ]
-                            ++ attributes
+                                _ ->
+                                    noOp
                         )
-                        []
+                     , defaultValue ""
+                     ]
+                        ++ attributes
                     )
-                  ]
-                , case enteredValue of
-                    Nothing ->
-                        []
-
-                    Just v ->
-                        [ ( ""
-                          , Label.label
-                                { lab
-                                    | color =
-                                        case enteredValue of
-                                            Nothing ->
-                                                Nothing
-
-                                            Just v ->
-                                                if isError v then
-                                                    Just SemanticUI.Red
-                                                else
-                                                    Nothing
-                                }
-                                v
-                          )
-                        ]
-                ]
+                    []
+              )
+            ]
         ]
