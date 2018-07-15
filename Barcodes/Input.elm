@@ -4,16 +4,13 @@ module Barcodes.Input exposing (Config, Msgs, State, attributes, clear, defaultC
 state is exposed via the opaque 'BarcodeInputValue' record, an instance of which
 should live in the parent state.
 
-
 # Component configuration and state
 
-@docs Config, Msgs, State,
-
+@docs Config, Msgs, State
 
 # Manage component state
 
-@docs init, defaultConfig, clear, enter, isEmpty, reset, update
-
+@docs init, defaultConfig, attributes, clear, enter, isEmpty, reset, update
 
 # View
 
@@ -36,6 +33,7 @@ import Maybe
 type alias Config msg =
     { size : Int
     , attributes : List (Attribute msg)
+    , triggerKeyCodes : List Int
     }
 
 
@@ -54,6 +52,9 @@ type alias Msgs msg =
 type State
     = State
         { clearKey : Int
+        -- Currently, transientValue cannot be accessed via this modules API
+        -- except via isEmpty. We could allow transientValue to be read, but
+        -- this would then make it easier to write incorrect code.
         , transientValue : String
         }
 
@@ -117,7 +118,9 @@ enter (State biv) v =
         }
 
 
-{-| Returns true iff nothing has been entered in the input.
+{-| Returns true iff nothing has been entered in the input. This may give an
+incorrect result if called very shorly after text has been entered into the
+input field.
 -}
 isEmpty : State -> Bool
 isEmpty (State biv) =
@@ -130,6 +133,7 @@ defaultConfig : Config msg
 defaultConfig =
     { size = 30
     , attributes = []
+    , triggerKeyCodes = [13]
     }
 
 
@@ -152,7 +156,7 @@ onKeyDownWithValue tagger =
 {-| View the component.
 -}
 view : Config msg -> Msgs msg -> State -> Html msg
-view { size, attributes } { onInput, onEnter, noOp } (State { clearKey, transientValue }) =
+view { size, attributes, triggerKeyCodes } { onInput, onEnter, noOp } (State { clearKey }) =
     div []
         [ Keyed.node "div" [] <|
             [ ( toString clearKey
@@ -162,12 +166,10 @@ view { size, attributes } { onInput, onEnter, noOp } (State { clearKey, transien
                      , Html.Events.onInput onInput
                      , onKeyDownWithValue
                         (\key value ->
-                            case key of
-                                13 ->
-                                    onEnter value
-
-                                _ ->
-                                    noOp
+                            if List.member key triggerKeyCodes then
+                                onEnter value
+                            else
+                                noOp
                         )
                      , defaultValue ""
                      ]
