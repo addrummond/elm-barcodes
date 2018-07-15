@@ -7,7 +7,7 @@ should live in the parent state.
 
 # Component configuration and state
 
-@docs Config, Msgs, State, attributes
+@docs Config, Msgs, State,
 
 
 # Manage component state
