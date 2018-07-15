@@ -1,0 +1,143 @@
+[
+  {
+    "name": "Barcodes.Input",
+    "comment": " A view-only component for receiving input from barcode scanners. The input\nstate is exposed via the opaque 'BarcodeInputValue' record, an instance of which\nshould live in the parent state.\n\n\n# Component configuration and state\n\n@docs Config, Msgs, State\n\n\n# Manage component state\n\n@docs init, defaultConfig, attributes, allowEmptyScans, clear, clobber, enter, isEmpty, reset, update\n\n\n# View\n\n@docs view\n\n",
+    "aliases": [
+      {
+        "name": "Config",
+        "comment": " The size and list of attributes for the text input node.\n",
+        "args": [
+          "msg"
+        ],
+        "type": "{ size : Int , attributes : List (Html.Attribute msg) , triggerKeyCodes : List Int , allowEmptyScans : Bool }"
+      },
+      {
+        "name": "Msgs",
+        "comment": " Specifies a no-op message, the message triggered on text input, and the\nmessage triggered when the scan terminates.\n",
+        "args": [
+          "msg"
+        ],
+        "type": "{ onInput : String -> msg, onEnter : String -> msg, noOp : msg }"
+      }
+    ],
+    "types": [
+      {
+        "name": "State",
+        "comment": " This should live somewhere in the state of the parent component.\n",
+        "args": [],
+        "cases": []
+      }
+    ],
+    "values": [
+      {
+        "name": "allowEmptyScans",
+        "comment": " Set the allowEmptyScans field of Config\n",
+        "type": "Bool -> Barcodes.Input.Config msg -> Barcodes.Input.Config msg"
+      },
+      {
+        "name": "attributes",
+        "comment": " Set the attributes filed of Config\n",
+        "type": "List (Html.Attribute msg) -> Barcodes.Input.Config msg -> Barcodes.Input.Config msg"
+      },
+      {
+        "name": "clear",
+        "comment": " Empty the barcode input.\n",
+        "type": "Barcodes.Input.State -> Barcodes.Input.State"
+      },
+      {
+        "name": "clobber",
+        "comment": " Set the text in the input field to the given value. As the name suggests,\nthis not something you would typically want to do. In particular, you should NOT\ntypically call this function to update the state in response to OnInput\nmessages.\n",
+        "type": "String -> Barcodes.Input.State -> Barcodes.Input.State"
+      },
+      {
+        "name": "defaultConfig",
+        "comment": " Default configuration\n",
+        "type": "Barcodes.Input.Config msg"
+      },
+      {
+        "name": "enter",
+        "comment": " This function should be used to update the state in response to OnEnter\nmessages.\n",
+        "type": "Barcodes.Input.State -> Barcodes.Input.State"
+      },
+      {
+        "name": "init",
+        "comment": " The state of an empty barcode input.\n",
+        "type": "Barcodes.Input.State"
+      },
+      {
+        "name": "isEmpty",
+        "comment": " Returns true iff nothing has been entered in the input. This may give an\nincorrect result if called very shorly after text has been entered into the\ninput field.\n",
+        "type": "Barcodes.Input.State -> Bool"
+      },
+      {
+        "name": "reset",
+        "comment": " Reset the barcode input to its initial state.\n",
+        "type": "Barcodes.Input.State -> Barcodes.Input.State"
+      },
+      {
+        "name": "update",
+        "comment": " This function should be used to update the state in response to OnUpdate\nmessages.\n",
+        "type": "String -> Barcodes.Input.State -> Barcodes.Input.State"
+      },
+      {
+        "name": "view",
+        "comment": " View the component.\n",
+        "type": "Barcodes.Input.Config msg -> Barcodes.Input.Msgs msg -> Barcodes.Input.State -> Html.Html msg"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  },
+  {
+    "name": "Barcodes.Render",
+    "comment": " A module for rendering barcodes using inline SVG. Currently, only code 39\nbarcodes are supported.\n\n@docs Barcode, barHeight, barWidth, barcode, code39, init, svgAttributes, wrapperDivAttributes\n\n",
+    "aliases": [
+      {
+        "name": "Barcode",
+        "comment": " Barcode configuration.\n",
+        "args": [
+          "msg"
+        ],
+        "type": "{ svgAttributes : List (Html.Attribute msg) , wrapperDivAttributes : List (Html.Attribute msg) , barWidth : Float , barHeight : Float , barcode : String , labelStyle : Barcodes.Render.LabelStyle , includeDelimiters : Bool }"
+      }
+    ],
+    "types": [],
+    "values": [
+      {
+        "name": "barHeight",
+        "comment": " Set the height of the barcode in px.\n",
+        "type": "Float -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "barWidth",
+        "comment": " Set the width of the barcode in px.\n",
+        "type": "Float -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "barcode",
+        "comment": " Set the barcode text\n",
+        "type": "String -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "code39",
+        "comment": " Render as a code 39 barcode\n",
+        "type": "Barcodes.Render.Barcode msg -> Maybe.Maybe (Html.Html msg)"
+      },
+      {
+        "name": "init",
+        "comment": " Default barcode configuration.\n",
+        "type": "Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "svgAttributes",
+        "comment": " Set the attributes for the <svg> element of the barcode.\n",
+        "type": "List (Html.Attribute msg) -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      },
+      {
+        "name": "wrapperDivAttributes",
+        "comment": " Set the attributes of the <div> wrapping the barcode and its label.\n",
+        "type": "List (Html.Attribute msg) -> Barcodes.Render.Barcode msg -> Barcodes.Render.Barcode msg"
+      }
+    ],
+    "generated-with-elm-version": "0.18.0"
+  }
+]
