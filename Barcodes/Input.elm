@@ -1,16 +1,19 @@
-module Barcodes.Input exposing (Config, Msgs, State, attributes, clear, defaultConfig, enter, init, isEmpty, reset, update, view)
+module Barcodes.Input exposing (Config, Msgs, State, allowEmptyScans, attributes, clear, clobber, defaultConfig, enter, init, isEmpty, reset, update, view)
 
 {-| A view-only component for receiving input from barcode scanners. The input
 state is exposed via the opaque 'BarcodeInputValue' record, an instance of which
 should live in the parent state.
 
+
 # Component configuration and state
 
 @docs Config, Msgs, State
 
+
 # Manage component state
 
-@docs init, defaultConfig, attributes, clear, enter, isEmpty, reset, update
+@docs init, defaultConfig, attributes, allowEmptyScans, clear, clobber, enter, isEmpty, reset, update
+
 
 # View
 
@@ -28,17 +31,18 @@ import Json.Decode as Json
 import Maybe
 
 
-{-| The size and list of attributes for the text <input>.
+{-| The size and list of attributes for the text input node.
 -}
 type alias Config msg =
     { size : Int
     , attributes : List (Attribute msg)
     , triggerKeyCodes : List Int
+    , allowEmptyScans : Bool
     }
 
 
-{-| Specifies a no-op message and the messages triggered on input and when enter
-is pressed.
+{-| Specifies a no-op message, the message triggered on text input, and the
+message triggered when the scan terminates.
 -}
 type alias Msgs msg =
     { onInput : String -> msg
@@ -52,10 +56,12 @@ type alias Msgs msg =
 type State
     = State
         { clearKey : Int
+
         -- Currently, transientValue cannot be accessed via this modules API
         -- except via isEmpty. We could allow transientValue to be read, but
         -- this would then make it easier to write incorrect code.
         , transientValue : String
+        , initialValue : String
         }
 
 
@@ -66,6 +72,7 @@ init =
     State
         { clearKey = 0
         , transientValue = ""
+        , initialValue = ""
         }
 
 
@@ -78,44 +85,49 @@ reset (State biv) =
     State
         { clearKey = biv.clearKey + 1
         , transientValue = ""
+        , initialValue = ""
+        }
+
+
+{-| Set the text in the input field to the given value. As the name suggests,
+this not something you would typically want to do. In particular, you should NOT
+typically call this function to update the state in response to OnInput
+messages.
+-}
+clobber : String -> State -> State
+clobber v (State biv) =
+    State
+        { clearKey = biv.clearKey + 1
+        , transientValue = v
+        , initialValue = v
         }
 
 
 {-| Empty the barcode input.
 -}
 clear : State -> State
-clear (State biv) =
+clear s =
+    clobber "" s
+
+
+{-| This function should be used to update the state in response to OnUpdate
+messages.
+-}
+update : String -> State -> State
+update v (State biv) =
     State
-        { clearKey = biv.clearKey + 1
-        , transientValue = ""
+        { clearKey = biv.clearKey
+        , transientValue = v
+        , initialValue = biv.initialValue
         }
 
 
-{-| Modify the value of the barcode input. If the second argument is the empty
-string, this is equivalent to 'clear'.
+{-| This function should be used to update the state in response to OnEnter
+messages.
 -}
-update : State -> String -> State
-update (State biv) v =
-    case v of
-        "" ->
-            clear (State biv)
-
-        _ ->
-            State
-                { clearKey = biv.clearKey
-                , transientValue = v
-                }
-
-
-{-| Set the entered value of the barcode input and then clear the text input
-box.
--}
-enter : State -> String -> State
-enter (State biv) v =
-    State
-        { clearKey = biv.clearKey + 1
-        , transientValue = ""
-        }
+enter : State -> State
+enter s =
+    clear s
 
 
 {-| Returns true iff nothing has been entered in the input. This may give an
@@ -133,7 +145,8 @@ defaultConfig : Config msg
 defaultConfig =
     { size = 30
     , attributes = []
-    , triggerKeyCodes = [13]
+    , triggerKeyCodes = [ 13 ]
+    , allowEmptyScans = False
     }
 
 
@@ -142,6 +155,13 @@ defaultConfig =
 attributes : List (Attribute msg) -> Config msg -> Config msg
 attributes atrs conf =
     { conf | attributes = atrs }
+
+
+{-| Set the allowEmptyScans field of Config
+-}
+allowEmptyScans : Bool -> Config msg -> Config msg
+allowEmptyScans b conf =
+    { conf | allowEmptyScans = b }
 
 
 onKeyDownWithValue : (Int -> String -> msg) -> Attribute msg
@@ -156,7 +176,7 @@ onKeyDownWithValue tagger =
 {-| View the component.
 -}
 view : Config msg -> Msgs msg -> State -> Html msg
-view { size, attributes, triggerKeyCodes } { onInput, onEnter, noOp } (State { clearKey }) =
+view { size, attributes, triggerKeyCodes, allowEmptyScans } { onInput, onEnter, noOp } (State { clearKey, initialValue }) =
     div []
         [ Keyed.node "div" [] <|
             [ ( toString clearKey
@@ -166,12 +186,12 @@ view { size, attributes, triggerKeyCodes } { onInput, onEnter, noOp } (State { c
                      , Html.Events.onInput onInput
                      , onKeyDownWithValue
                         (\key value ->
-                            if List.member key triggerKeyCodes then
+                            if (allowEmptyScans || String.length value > 0) && List.member key triggerKeyCodes then
                                 onEnter value
                             else
                                 noOp
                         )
-                     , defaultValue ""
+                     , defaultValue initialValue
                      ]
                         ++ attributes
                     )

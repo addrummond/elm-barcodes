@@ -36,13 +36,13 @@ update msg model =
             ( model, Cmd.none )
 
         OnInput s ->
-            ( { model | inputState = BI.update model.inputState s }
+            ( { model | inputState = BI.update s model.inputState }
             , Cmd.none
             )
 
         OnEnter s ->
             ( { model
-                | inputState = BI.clear model.inputState
+                | inputState = BI.enter model.inputState
                 , scans = s :: model.scans
               }
             , Dom.focus "barcodeinput" |> Task.attempt (always NoOp)
