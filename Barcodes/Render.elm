@@ -74,7 +74,7 @@ code39Chars =
 
 code39StartStop : List Bar
 code39StartStop =
-    [N,S,N,W,W,N]
+    [ N, S, N, W, W, N ]
 
 
 widthOfBar : Bar -> Int
@@ -238,42 +238,50 @@ code39 ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode, lab
                         ]
                         :: wrapperDivAttributes
                     )
-                    [ svg
-                    , div
-                        [ style
-                            [ ( "position", "absolute" )
-                            , ( "left", "0" )
-                            , ( "bottom", "0" )
-                            , ( "width", toString width ++ "px" )
-                            ]
-                        ]
-                        [ div
-                            [ style
-                                [ ( "width", toString (width - loffset - roffset) ++ barWidthUnit )
-                                , ( "margin-left", toString loffset ++ barWidthUnit )
-                                , ( "display", "table" )
-                                , ( "transform"
-                                  , case labelStyle of
-                                        LabelHalfBelow ->
-                                            "translateY(50%)"
+                    (List.concat
+                        [ [ svg ]
+                        , case labelStyle of
+                            NoLabel ->
+                                []
 
-                                        _ ->
-                                            "translateY(100%)"
-                                  )
-                                , ( "text-align", "center" )
-                                , ( "background", "white" )
-                                , ( "color", "black" )
-                                , ( "padding-bottom", "0" )
-                                , ( "font-size", toString fontSize ++ barWidthUnit )
-                                , ( "font-family", "monospace" )
-                                , ( "letter-spacing", toString (fontSize * 0.4) ++ barWidthUnit )
-                                , ( "user-select", "none" )
-                                , ( "text-indent", "0.5ex" )
+                            _ ->
+                                [ div
+                                    [ style
+                                        [ ( "position", "absolute" )
+                                        , ( "left", "0" )
+                                        , ( "bottom", "0" )
+                                        , ( "width", toString width ++ "px" )
+                                        ]
+                                    ]
+                                    [ div
+                                        [ style
+                                            [ ( "width", toString (width - loffset - roffset) ++ barWidthUnit )
+                                            , ( "margin-left", toString loffset ++ barWidthUnit )
+                                            , ( "display", "table" )
+                                            , ( "transform"
+                                              , case labelStyle of
+                                                    LabelHalfBelow ->
+                                                        "translateY(50%)"
+
+                                                    _ ->
+                                                        "translateY(100%)"
+                                              )
+                                            , ( "text-align", "center" )
+                                            , ( "background", "white" )
+                                            , ( "color", "black" )
+                                            , ( "padding-bottom", "0" )
+                                            , ( "font-size", toString fontSize ++ barWidthUnit )
+                                            , ( "font-family", "monospace" )
+                                            , ( "letter-spacing", toString (fontSize * 0.4) ++ barWidthUnit )
+                                            , ( "user-select", "none" )
+                                            , ( "text-indent", "0.5ex" )
+                                            ]
+                                        ]
+                                        [ text withDelims ]
+                                    ]
                                 ]
-                            ]
-                            [ text withDelims ]
                         ]
-                    ]
+                    )
             )
 
 
