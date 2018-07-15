@@ -255,8 +255,13 @@ code39 ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode, lab
                                     ]
                                     [ div
                                         [ style
-                                            [ ( "width", toString (width - loffset - roffset) ++ barWidthUnit )
-                                            , ( "margin-left", toString loffset ++ barWidthUnit )
+                                            [ ( "width"
+                                              , toString (width - loffset - roffset)
+                                                    ++ barWidthUnit
+                                              )
+                                            , ( "margin-left"
+                                              , toString loffset ++ barWidthUnit
+                                              )
                                             , ( "display", "table" )
                                             , ( "transform"
                                               , case labelStyle of
@@ -270,9 +275,13 @@ code39 ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, barcode, lab
                                             , ( "background", "white" )
                                             , ( "color", "black" )
                                             , ( "padding-bottom", "0" )
-                                            , ( "font-size", toString fontSize ++ barWidthUnit )
+                                            , ( "font-size"
+                                              , toString fontSize ++ barWidthUnit
+                                              )
                                             , ( "font-family", "monospace" )
-                                            , ( "letter-spacing", toString (fontSize * 0.4) ++ barWidthUnit )
+                                            , ( "letter-spacing"
+                                              , toString (fontSize * 0.4) ++ barWidthUnit
+                                              )
                                             , ( "user-select", "none" )
                                             , ( "text-indent", "0.5ex" )
                                             ]
@@ -318,31 +327,34 @@ code39BarcodeUnwrappedSvg { svgAttributes, barWidth, barHeight, barcode } =
                 fontSize =
                     round <| 0.1 * barHeight
 
+                advance bar i =
+                    case bar of
+                        S ->
+                            ( [], i + toFloat (widthOfBar N) )
+
+                        _ ->
+                            ( [ ( i
+                                , Svg.rect
+                                    [ Svg.Attributes.x (toString i ++ barWidthUnit)
+                                    , Svg.Attributes.y (toString 0)
+                                    , Svg.Attributes.width
+                                        (toString (barWidth * toFloat (widthOfBar bar)) ++ barWidthUnit)
+                                    , Svg.Attributes.height
+                                        (toString barHeight ++ barHeightUnit)
+                                    ]
+                                    []
+                                )
+                              ]
+                            , i + (barWidth * toFloat (widthOfBar bar)) + (barWidth * toFloat (widthOfBar N))
+                            )
+
                 ( bs, totalWidth ) =
                     allBars
                         |> State.run 0
                         << State.traverse
                             (\bar ->
                                 State.advance
-                                    (\i ->
-                                        case bar of
-                                            S ->
-                                                ( [], i + toFloat (widthOfBar N) )
-
-                                            _ ->
-                                                ( [ ( i
-                                                    , Svg.rect
-                                                        [ Svg.Attributes.x (toString i ++ barWidthUnit)
-                                                        , Svg.Attributes.y (toString 0)
-                                                        , Svg.Attributes.width (toString (barWidth * toFloat (widthOfBar bar)) ++ barWidthUnit)
-                                                        , Svg.Attributes.height (toString barHeight ++ barHeightUnit)
-                                                        ]
-                                                        []
-                                                    )
-                                                  ]
-                                                , i + (barWidth * toFloat (widthOfBar bar)) + (barWidth * toFloat (widthOfBar N))
-                                                )
-                                    )
+                                    (\i -> advance bar i)
                             )
 
                 cbs =
