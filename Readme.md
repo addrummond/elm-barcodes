@@ -6,3 +6,7 @@ input from barcode scanners. The latter is not trivial, since barcode scanners
 the `value` property of a text input:
 
     https://github.com/etaque/elm-form/issues/54
+
+To compile the example app, run the following command from the main project dir:
+
+    elm make example/Main.elm --output app.html
