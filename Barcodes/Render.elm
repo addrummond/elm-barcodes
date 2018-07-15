@@ -18,93 +18,75 @@ import Svg.Attributes
 
 
 type Bar
-    = WideBar
-    | NarrowBar
-    | WideSpace
-
-
-parseBars : String -> List Bar
-parseBars =
-    String.toList
-        >> List.map
-            (\c ->
-                case c of
-                    ':' ->
-                        WideBar
-
-                    '|' ->
-                        NarrowBar
-
-                    _ ->
-                        WideSpace
-            )
+    = W -- Wide bar
+    | N -- Narrow bar
+    | S -- Wide space
 
 
 code39 : Dict Char (List Bar)
 code39 =
-    Dict.fromList <|
-        List.map (\( c, s ) -> ( c, parseBars s ))
-            [ ( 'A', [W,N,N,S,N,W] )
-            ,( 'B', [N,W,N,S,N,W] )
-            ,( 'C', [W,W,N,S,N,N] )
-            ,( 'D', [N,N,W,S,N,W] )
-            ,( 'E', [W,N,W,S,N,N] )
-            ,( 'F', [N,W,W,S,N,N] )
-            ,( 'G', [N,N,N,S,W,W] )
-            ,( 'H', [W,N,N,S,W,N] )
-            ,( 'I', [N,W,N,S,W,N] )
-            ,( 'J', [N,N,W,S,W,N] )
-            ,( 'K', [W,N,N,N,S,W] )
-            ,( 'L', [N,W,N,N,S,W] )
-            ,( 'M', [W,W,N,N,S,N] )
-            ,( 'N', [N,N,W,N,S,W] )
-            ,( 'O', [W,N,W,N,S,N] )
-            ,( 'P', [N,W,W,N,S,N] )
-            ,( 'Q', [N,N,N,W,S,W] )
-            ,( 'R', [W,N,N,W,S,N] )
-            ,( 'S', [N,W,N,W,S,N] )
-            ,( 'T', [N,N,W,W,S,N] )
-            ,( 'U', [W,S,N,N,N,W] )
-            ,( 'V', [N,S,W,N,N,W] )
-            ,( 'W', [W,S,W,N,N,N] )
-            ,( 'X', [N,S,N,W,N,W] )
-            ,( 'Y', [W,S,N,W,N,N] )
-            ,( 'Z', [N,S,W,W,N,N] )
-            ,( '0', [N,N,S,W,W,N] )
-            ,( '1', [W,N,S,N,N,W] )
-            ,( '2', [N,W,S,N,N,W] )
-            ,( '3', [W,W,S,N,N,N] )
-            ,( '4', [N,N,S,W,N,W] )
-            ,( '5', [W,N,S,W,N,N] )
-            ,( '6', [N,W,S,W,N,N] )
-            ,( '7', [N,N,S,N,W,W] )
-            ,( '8', [W,N,S,N,W,N] )
-            ,( '9', [N,W,S,N,W,N] )
-            ,( ' ', [N,S,W,N,W,N] )
-            ,( '-', [N,S,N,N,W,W] )
-            ,( '$', [N,S,N,S,N,S,N,N] )
-            ,( '%', [N,N,S,N,S,N,S,N] )
-            ,( '.', [W,S,N,N,W,N] )
-            ,( '/', [N,S,N,S,N,N,S,N] )
-            ( '+', [N,S,N,N,S,N,S,N] )
-            ]
+    Dict.fromList
+        [ ( 'A', [ W, N, N, S, N, W ] )
+        , ( 'B', [ N, W, N, S, N, W ] )
+        , ( 'C', [ W, W, N, S, N, N ] )
+        , ( 'D', [ N, N, W, S, N, W ] )
+        , ( 'E', [ W, N, W, S, N, N ] )
+        , ( 'F', [ N, W, W, S, N, N ] )
+        , ( 'G', [ N, N, N, S, W, W ] )
+        , ( 'H', [ W, N, N, S, W, N ] )
+        , ( 'I', [ N, W, N, S, W, N ] )
+        , ( 'J', [ N, N, W, S, W, N ] )
+        , ( 'K', [ W, N, N, N, S, W ] )
+        , ( 'L', [ N, W, N, N, S, W ] )
+        , ( 'M', [ W, W, N, N, S, N ] )
+        , ( 'N', [ N, N, W, N, S, W ] )
+        , ( 'O', [ W, N, W, N, S, N ] )
+        , ( 'P', [ N, W, W, N, S, N ] )
+        , ( 'Q', [ N, N, N, W, S, W ] )
+        , ( 'R', [ W, N, N, W, S, N ] )
+        , ( 'S', [ N, W, N, W, S, N ] )
+        , ( 'T', [ N, N, W, W, S, N ] )
+        , ( 'U', [ W, S, N, N, N, W ] )
+        , ( 'V', [ N, S, W, N, N, W ] )
+        , ( 'W', [ W, S, W, N, N, N ] )
+        , ( 'X', [ N, S, N, W, N, W ] )
+        , ( 'Y', [ W, S, N, W, N, N ] )
+        , ( 'Z', [ N, S, W, W, N, N ] )
+        , ( '0', [ N, N, S, W, W, N ] )
+        , ( '1', [ W, N, S, N, N, W ] )
+        , ( '2', [ N, W, S, N, N, W ] )
+        , ( '3', [ W, W, S, N, N, N ] )
+        , ( '4', [ N, N, S, W, N, W ] )
+        , ( '5', [ W, N, S, W, N, N ] )
+        , ( '6', [ N, W, S, W, N, N ] )
+        , ( '7', [ N, N, S, N, W, W ] )
+        , ( '8', [ W, N, S, N, W, N ] )
+        , ( '9', [ N, W, S, N, W, N ] )
+        , ( ' ', [ N, S, W, N, W, N ] )
+        , ( '-', [ N, S, N, N, W, W ] )
+        , ( '$', [ N, S, N, S, N, S, N, N ] )
+        , ( '%', [ N, N, S, N, S, N, S, N ] )
+        , ( '.', [ W, S, N, N, W, N ] )
+        , ( '/', [ N, S, N, S, N, N, S, N ] )
+        , ( '+', [ N, S, N, N, S, N, S, N ] )
+        ]
 
 
 code39StartStop : List Bar
 code39StartStop =
-    parseBars "| |::|"
+    [N,S,N,W,W,N]
 
 
 widthOfBar : Bar -> Int
 widthOfBar bar =
     case bar of
-        WideBar ->
+        W ->
             2
 
-        NarrowBar ->
+        N ->
             1
 
-        WideSpace ->
+        S ->
             0
 
 
@@ -336,8 +318,8 @@ code39BarcodeUnwrappedSvg { svgAttributes, barWidth, barHeight, barcode } =
                                 State.advance
                                     (\i ->
                                         case bar of
-                                            WideSpace ->
-                                                ( [], i + toFloat (widthOfBar NarrowBar) )
+                                            S ->
+                                                ( [], i + toFloat (widthOfBar N) )
 
                                             _ ->
                                                 ( [ ( i
@@ -350,7 +332,7 @@ code39BarcodeUnwrappedSvg { svgAttributes, barWidth, barHeight, barcode } =
                                                         []
                                                     )
                                                   ]
-                                                , i + (barWidth * toFloat (widthOfBar bar)) + (barWidth * toFloat (widthOfBar NarrowBar))
+                                                , i + (barWidth * toFloat (widthOfBar bar)) + (barWidth * toFloat (widthOfBar N))
                                                 )
                                     )
                             )
