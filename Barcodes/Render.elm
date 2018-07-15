@@ -226,6 +226,7 @@ code39BarcodeSvg ({ svgAttributes, wrapperDivAttributes, barWidth, barHeight, ba
                 div
                     (style
                         [ ( "position", "relative" )
+                        , ( "display", "table" )
                         , ( "width", toString width ++ "px" )
                         , ( "height", toString barHeight ++ barHeightUnit )
                         , ( "background", "white" )

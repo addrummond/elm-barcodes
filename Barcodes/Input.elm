@@ -1,24 +1,21 @@
-module Barcodes.Input exposing (Config, Msgs, State, clear, defaultConfig, enter, enteredValue, init, isEmpty, reset, update, view)
+module Barcodes.Input exposing (Config, Msgs, State, attributes, clear, defaultConfig, enter, init, isEmpty, reset, update, view)
 
-{-| A view-only component for receiving input from barcode scanners. It consists
-of a text input and an optional "entered value" displayed to the right of the
-input. A String -> Bool predicate determines whether or not the contents
-of the text input and/or the entered value are displayed with an error
-highlight. The input state is exposed via the opaque 'BarcodeInputValue' record,
-an instance of which should live in the parent state.
+{-| A view-only component for receiving input from barcode scanners. The input
+state is exposed via the opaque 'BarcodeInputValue' record, an instance of which
+should live in the parent state.
 
 
-# Component configuration, messages and state
+# Component configuration and state
 
-@docs Config, Msgs, State
-
-
-# Initialize, update and interrogate component state
-
-@docs init, defaultConfig, clear, enter, enteredValue, isEmpty, reset, update
+@docs Config, Msgs, State, attributes
 
 
-# View the component
+# Manage component state
+
+@docs init, defaultConfig, clear, enter, isEmpty, reset, update
+
+
+# View
 
 @docs view
 
@@ -42,7 +39,7 @@ type alias Config msg =
     }
 
 
-{-| Specifies a no-op message and messages triggered on input and when enter
+{-| Specifies a no-op message and the messages triggered on input and when enter
 is pressed.
 -}
 type alias Msgs msg =
@@ -58,22 +55,20 @@ type State
     = State
         { clearKey : Int
         , transientValue : String
-        , enteredValue : Maybe String
         }
 
 
-{-| The initial value for the text input (empty string).
+{-| The state of an empty barcode input.
 -}
 init : State
 init =
     State
         { clearKey = 0
         , transientValue = ""
-        , enteredValue = Nothing
         }
 
 
-{-| Reset the text input to its initial state.
+{-| Reset the barcode input to its initial state.
 -}
 reset : State -> State
 reset (State biv) =
@@ -82,22 +77,20 @@ reset (State biv) =
     State
         { clearKey = biv.clearKey + 1
         , transientValue = ""
-        , enteredValue = Nothing
         }
 
 
-{-| Empty the text input.
+{-| Empty the barcode input.
 -}
 clear : State -> State
 clear (State biv) =
     State
         { clearKey = biv.clearKey + 1
         , transientValue = ""
-        , enteredValue = biv.enteredValue
         }
 
 
-{-| Modify the value of the text input. If the second argument is the empty
+{-| Modify the value of the barcode input. If the second argument is the empty
 string, this is equivalent to 'clear'.
 -}
 update : State -> String -> State
@@ -110,40 +103,25 @@ update (State biv) v =
             State
                 { clearKey = biv.clearKey
                 , transientValue = v
-                , enteredValue = biv.enteredValue
                 }
 
 
-{-| Add an "entered value" to the right of the text input and clear the text
-input.
+{-| Set the entered value of the barcode input and then clear the text input
+box.
 -}
 enter : State -> String -> State
 enter (State biv) v =
     State
         { clearKey = biv.clearKey + 1
         , transientValue = ""
-        , enteredValue =
-            case v of
-                "" ->
-                    Nothing
-
-                _ ->
-                    Just v
         }
-
-
-{-| The value, if any, which has been scanned in.
--}
-enteredValue : State -> Maybe String
-enteredValue (State { enteredValue }) =
-    enteredValue
 
 
 {-| Returns true iff nothing has been entered in the input.
 -}
 isEmpty : State -> Bool
 isEmpty (State biv) =
-    biv.transientValue == "" && biv.enteredValue == Nothing
+    biv.transientValue == ""
 
 
 {-| Default configuration
@@ -153,6 +131,13 @@ defaultConfig =
     { size = 30
     , attributes = []
     }
+
+
+{-| Set the attributes filed of Config
+-}
+attributes : List (Attribute msg) -> Config msg -> Config msg
+attributes atrs conf =
+    { conf | attributes = atrs }
 
 
 onKeyDownWithValue : (Int -> String -> msg) -> Attribute msg
@@ -167,9 +152,9 @@ onKeyDownWithValue tagger =
 {-| View the component.
 -}
 view : Config msg -> Msgs msg -> State -> Html msg
-view { size, attributes } { onInput, onEnter, noOp } (State { clearKey, transientValue, enteredValue }) =
+view { size, attributes } { onInput, onEnter, noOp } (State { clearKey, transientValue }) =
     div []
-        [ Keyed.node "input" [] <|
+        [ Keyed.node "div" [] <|
             [ ( toString clearKey
               , input
                     ([ type_ "text"
